@@ -17,19 +17,23 @@ zapi.login(config.ZABBIX_LOGIN, config.ZABBIX_PASSWORD)
 
 
 def get_check(host, item):
-    founded = -1
+    error_code = 2          # NOT FOUND
     for check in config.HEALTHCHECKS:
         if check.slug != host:
             continue
-        g.go(check.url)
+        try:
+            g.go(check.url)
+        except Exception as e:
+            return 3        # NETWORK ERROR
         data = loads(g.doc.body.decode('utf-8'))
         for result in data['results']:
             if result['checker'] != item:
                 continue
-            founded = 1
+            error_code = 0  # OK
+            # проверка вернула ошибку
             if not result['passed']:
-                return 0
-    return founded
+                return 1    # NOT PASSED
+    return error_code
 
 
 if __name__ == '__main__':
