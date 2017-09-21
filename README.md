@@ -1,3 +1,5 @@
+Проект позволяет мониторить через Zabbix Flask-приложения с помощью [healthcheck](https://github.com/Runscope/healthcheck)
+
 ## Installation
 
 1. Внести данные в конфиг
