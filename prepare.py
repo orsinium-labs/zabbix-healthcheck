@@ -99,24 +99,24 @@ for host in hosts:
         g.go(check.url)
         data = loads(g.doc.body.decode('utf-8'))
         for result in data['results']:
-            name = 'Check {} is failed'.format(result['checker'])
-            # пропускаем уже созданные triggers
-            if name in triggers_names:
-                print('Trigger for {} already added'.format(result['checker']))
-                continue
             key_name = '{}[{},{}]'.format(
                 config.SCRIPT_NAME,
                 check.slug,
                 result['checker'],
             )
-            # создаем новый trigger
-            zapi.trigger.create(
-                description=name,
-                expression='{' + host['host'] + ':' + key_name + '.max(3)}<1',
-                priority=4,     # high
-            )
-            triggers_names.append(name)
-            print('Created trigger {} for host {}'.format(
-                result['checker'],
-                host['host'],
-            ))
+            # создаем триггеры
+            for name, expr in config.TEMPLATES:
+                name = name.format(result['checker'])
+                # пропускаем уже созданные триггеры
+                if name in triggers_names:
+                    print('Trigger "{}" already added'.format(name))
+                    continue
+                expr = expr.replace('HOST', host['host'])
+                expr = expr.replace('KEY', key_name)
+                zapi.trigger.create(
+                    description=name,
+                    expression=expr,
+                    priority=4,     # high
+                )
+                triggers_names.append(name)
+                print('Created trigger "{}"'.format(name))

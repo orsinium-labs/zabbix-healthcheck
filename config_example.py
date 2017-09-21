@@ -19,3 +19,9 @@ HEALTHCHECKS = (
         dnsname='example.com',
     ),
 )
+
+TEMPLATES = (
+    ('Check {} is not passed', '{HOST:KEY.min(3)}=1'),
+    ('Checker {} is invalid', '{HOST:KEY.min(3)}=2'),
+    ('Checker {} not found', '{HOST:KEY.min(3)}=3'),
+)
